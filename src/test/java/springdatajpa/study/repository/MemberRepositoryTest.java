@@ -10,6 +10,7 @@ import springdatajpa.study.dto.MemberDto;
 import springdatajpa.study.entity.Member;
 import springdatajpa.study.entity.Team;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -174,5 +175,22 @@ class MemberRepositoryTest {
 		assertThat(memberDto.get(0).getId()).isEqualTo(m1.getId());
 		assertThat(memberDto.get(0).getUsername()).isEqualTo(m1.getUsername());
 		assertThat(memberDto.get(0).getTeamName()).isEqualTo(team.getName());
+	}
+
+	@DisplayName("멤버 이름으로 IN절로 검색하여 목록 조회")
+	@Test
+	void findByNames() {
+
+		// given
+		Member m1 = new Member("AAA", 10);
+		Member m2 = new Member("BBB", 20);
+		memberRepository.save(m1);
+		memberRepository.save(m2);
+
+		// when
+		List<Member> usernameList = memberRepository.findByNames(Arrays.asList("AAA", "BBB"));
+
+		// then
+		assertThat(usernameList).contains(m1, m2);
 	}
 }
