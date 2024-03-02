@@ -389,4 +389,12 @@ class MemberRepositoryTest {
 	    // when
 		List<Member> result = memberRepository.findLockByUsername("member1");
 	}
+
+	@DisplayName("사용자 정의 리포지토리")
+	@Test
+	void callCustom() {
+
+		// given
+	    List<Member> result = memberRepository.findMemberCustom();
+	}
 }
