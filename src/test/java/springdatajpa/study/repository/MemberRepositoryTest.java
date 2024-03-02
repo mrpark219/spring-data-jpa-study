@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import springdatajpa.study.dto.MemberDto;
 import springdatajpa.study.entity.Member;
+import springdatajpa.study.entity.Team;
 
 import java.util.List;
 
@@ -19,6 +21,9 @@ class MemberRepositoryTest {
 
 	@Autowired
 	MemberRepository memberRepository;
+
+	@Autowired
+	TeamRepository teamRepository;
 
 	@DisplayName("멤버 생성 및 저장 후 조회하여 같은 데이터가 있는지 확인.")
 	@Test
@@ -131,5 +136,43 @@ class MemberRepositoryTest {
 
 		// then
 		assertThat(result.get(0)).isEqualTo(m1);
+	}
+
+	@DisplayName("모든 멤버의 이름을 List<String>으로 조회")
+	@Test
+	void findUsernameList() {
+
+		// given
+		Member m1 = new Member("AAA", 10);
+		Member m2 = new Member("BBB", 20);
+		memberRepository.save(m1);
+		memberRepository.save(m2);
+
+		// when
+		List<String> usernameList = memberRepository.findUsernameList();
+
+		// then
+		assertThat(usernameList).contains(m1.getUsername(), m2.getUsername());
+	}
+
+	@DisplayName("모든 멤버의 아이디, 유저네임, 팀 이름 조회")
+	@Test
+	void findMemberDto() {
+
+		// given
+		Team team = new Team("teamA");
+		teamRepository.save(team);
+
+		Member m1 = new Member("AAA", 10);
+		m1.setTeam(team);
+		memberRepository.save(m1);
+
+		// when
+		List<MemberDto> memberDto = memberRepository.findMemberDto();
+
+		// then
+		assertThat(memberDto.get(0).getId()).isEqualTo(m1.getId());
+		assertThat(memberDto.get(0).getUsername()).isEqualTo(m1.getUsername());
+		assertThat(memberDto.get(0).getTeamName()).isEqualTo(team.getName());
 	}
 }
