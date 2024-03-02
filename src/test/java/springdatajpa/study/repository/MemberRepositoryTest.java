@@ -79,4 +79,25 @@ class MemberRepositoryTest {
 
 		assertThat(deletedCount).isEqualTo(0);
 	}
+
+	@DisplayName("username이 일치하고 나이가 더 많은 회원 목록 조회")
+	@Test
+	void findByUsernameAndAgeGreaterThen() {
+
+		// given
+		Member m1 = new Member("AAA", 10);
+		Member m2 = new Member("AAA", 20);
+		memberRepository.save(m1);
+		memberRepository.save(m2);
+
+		// when
+		List<Member> result = memberRepository.findByUsernameAndAgeGreaterThan("AAA", 15);
+
+		// then
+		assertThat(result.get(0).getUsername()).isEqualTo("AAA");
+		assertThat(result.get(0).getAge()).isEqualTo(20);
+		assertThat(result.size()).isEqualTo(1);
+	}
+
+
 }
