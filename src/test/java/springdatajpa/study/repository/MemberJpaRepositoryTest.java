@@ -36,21 +36,21 @@ class MemberJpaRepositoryTest {
 		assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
 		assertThat(findMember).isEqualTo(member);
 	}
-	
+
 	@DisplayName("멤버 CRUD 확인.")
 	@Test
 	void basicCRUD() {
-	    
-	    // given
-	    Member member1 = new Member("member1");
-	    Member member2 = new Member("member2");
+
+		// given
+		Member member1 = new Member("member1");
+		Member member2 = new Member("member2");
 		memberJpaRepository.save(member1);
 		memberJpaRepository.save(member2);
 
-	    // when
+		// when
 		// 단건 조회
-	    Member findMember1 = memberJpaRepository.findById(member1.getId()).get();
-	    Member findMember2 = memberJpaRepository.findById(member2.getId()).get();
+		Member findMember1 = memberJpaRepository.findById(member1.getId()).get();
+		Member findMember2 = memberJpaRepository.findById(member2.getId()).get();
 
 		// 리스트 조회
 		List<Member> all = memberJpaRepository.findAll();
@@ -75,12 +75,12 @@ class MemberJpaRepositoryTest {
 
 		assertThat(deletedCount).isEqualTo(0);
 	}
-	
+
 	@DisplayName("username이 일치하고 나이가 더 많은 멤버 목록 조회")
 	@Test
 	void findByUsernameAndAgeGreaterThen() {
-	    
-	    // given
+
+		// given
 		Member m1 = new Member("AAA", 10);
 		Member m2 = new Member("AAA", 20);
 		memberJpaRepository.save(m1);
@@ -90,26 +90,50 @@ class MemberJpaRepositoryTest {
 		List<Member> result = memberJpaRepository.findByUsernameAndAgeGreaterThan("AAA", 15);
 
 		// then
-	    assertThat(result.get(0).getUsername()).isEqualTo("AAA");
-	    assertThat(result.get(0).getAge()).isEqualTo(20);
-	    assertThat(result.size()).isEqualTo(1);
+		assertThat(result.get(0).getUsername()).isEqualTo("AAA");
+		assertThat(result.get(0).getAge()).isEqualTo(20);
+		assertThat(result.size()).isEqualTo(1);
 	}
 
 	@DisplayName("usernmae이 일치하는 멤버 목록 조회(NamedQuery)")
 	@Test
 	void findByUsername() {
 
-	    // given
+		// given
 		Member m1 = new Member("AAA", 10);
 		Member m2 = new Member("BBB", 20);
 		memberJpaRepository.save(m1);
 		memberJpaRepository.save(m2);
 
-	    // when
+		// when
 		List<Member> result = memberJpaRepository.findByUsername("AAA");
 		Member findMember = result.get(0);
 
-	    // then
+		// then
 		assertThat(findMember).isEqualTo(m1);
+	}
+
+	@DisplayName("전체 멤버 조회 페이징")
+	@Test
+	void paging() {
+
+		// given
+		memberJpaRepository.save(new Member("member1", 10));
+		memberJpaRepository.save(new Member("member2", 10));
+		memberJpaRepository.save(new Member("member3", 10));
+		memberJpaRepository.save(new Member("member4", 10));
+		memberJpaRepository.save(new Member("member5", 10));
+
+		int age = 10;
+		int offset = 0;
+		int limit = 3;
+
+		// when
+		List<Member> members = memberJpaRepository.findByPage(age, offset, limit);
+		long totalCount = memberJpaRepository.totalCount(age);
+
+		// then
+		assertThat(members.size()).isEqualTo(3);
+		assertThat(totalCount).isEqualTo(5);
 	}
 }
