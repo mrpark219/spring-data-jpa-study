@@ -11,7 +11,6 @@ import springdatajpa.study.entity.Member;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -115,5 +114,22 @@ class MemberRepositoryTest {
 
 		// then
 		assertThat(findMember).isEqualTo(m1);
+	}
+
+	@DisplayName("username과 나이가 일치하는 멤버 목록 조회")
+	@Test
+	void findMember() {
+
+		// given
+		Member m1 = new Member("AAA", 10);
+		Member m2 = new Member("BBB", 20);
+		memberRepository.save(m1);
+		memberRepository.save(m2);
+
+		// when
+		List<Member> result = memberRepository.findMember("AAA", 10);
+
+		// then
+		assertThat(result.get(0)).isEqualTo(m1);
 	}
 }
