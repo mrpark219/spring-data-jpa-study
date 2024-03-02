@@ -4,9 +4,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import springdatajpa.study.repository.MemberRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,6 +19,9 @@ class MemberTest {
 
 	@PersistenceContext
 	EntityManager em;
+
+	@Autowired
+	MemberRepository memberRepository;
 
 	@DisplayName("멤버, 팀 연관관계 변경 확인.")
 	@Test
@@ -58,5 +63,31 @@ class MemberTest {
 
 		assertThat(findTeamA.getMembers()).contains(findMember1, findMember2);
 		assertThat(findTeamB.getMembers()).contains(findMember3, findMember4);
+	}
+
+	@DisplayName("JPA Auditing")
+	@Test
+	void jpaEventBaseEntity() throws InterruptedException {
+
+	    // given
+		Member member = new Member("member1");
+		// @PrePersist
+		memberRepository.save(member);
+
+		Thread.sleep(100);
+		member.setUsername("member2");
+
+		// @PreUpdate
+		em.flush();
+		em.clear();
+
+	    // when
+		Member findMember = memberRepository.findById(member.getId()).get();
+
+		// then
+		System.out.println(findMember.getCreatedDate());
+		System.out.println(findMember.getLastModifiedDate());
+		System.out.println(findMember.getCreatedBy());
+		System.out.println(findMember.getLastModifiedBy());
 	}
 }
