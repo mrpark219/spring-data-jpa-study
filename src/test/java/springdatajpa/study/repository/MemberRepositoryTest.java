@@ -325,4 +325,39 @@ class MemberRepositoryTest {
 		// then
 		assertThat(resultCount).isEqualTo(3);
 	}
+	
+	@DisplayName("지연로딩 확인")
+	@Test
+	void findMemberLazy() {
+	    
+	    // given
+	    // member1 -> teamA
+	    // member2 -> teamB
+
+		Team teamA = new Team("teamA");
+		Team teamB = new Team("teamB");
+		teamRepository.save(teamA);
+		teamRepository.save(teamB);
+
+		Member member1 = new Member("member1", 10, teamA);
+		Member member2 = new Member("member2", 10, teamB);
+		memberRepository.save(member1);
+		memberRepository.save(member2);
+
+		em.flush();
+		em.clear();
+
+	    // when
+		List<Member> members = memberRepository.findEntityGraphByUsername("member1");
+
+		// then 지연 로딩 발생 확인
+		for(Member member : members) {
+			System.out.println("member = " + member.getUsername());
+			// 지연 로딩 발생
+			System.out.println("member.teamClass = " + member.getTeam().getClass());
+			System.out.println("team = " + member.getTeam().getName());
+		}
+	}
+
+
 }
