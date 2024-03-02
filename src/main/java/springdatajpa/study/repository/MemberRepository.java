@@ -1,5 +1,6 @@
 package springdatajpa.study.repository;
 
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.QueryHint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -70,4 +71,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	@QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
 	Member findReadOnlyByUsername(String username);
+
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	List<Member> findLockByUsername(String username);
 }
