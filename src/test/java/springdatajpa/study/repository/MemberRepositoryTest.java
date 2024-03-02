@@ -12,6 +12,7 @@ import springdatajpa.study.entity.Team;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -192,5 +193,28 @@ class MemberRepositoryTest {
 
 		// then
 		assertThat(usernameList).contains(m1, m2);
+	}
+
+	@DisplayName("멤버 이름으로 IN절로 검색하여 목록 조회")
+	@Test
+	void findListByUsername() {
+
+		// given
+		Member m1 = new Member("AAA", 10);
+		Member m2 = new Member("BBB", 20);
+		memberRepository.save(m1);
+		memberRepository.save(m2);
+
+		// when
+		List<Member> memberList = memberRepository.findListByUsername("AAA");
+
+		Member findMember = memberRepository.findMemberByUsername("AAA");
+
+		Optional<Member> optionalMember = memberRepository.findOptionalByUsername("AAA");
+
+		// then
+		assertThat(memberList.get(0)).isEqualTo(m1);
+		assertThat(findMember).isEqualTo(m1);
+		assertThat(optionalMember.get()).isEqualTo(m1);
 	}
 }
