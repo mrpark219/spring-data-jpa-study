@@ -76,7 +76,7 @@ class MemberJpaRepositoryTest {
 		assertThat(deletedCount).isEqualTo(0);
 	}
 	
-	@DisplayName("username이 일치하고 나이가 더 많은 회원 목록 조회")
+	@DisplayName("username이 일치하고 나이가 더 많은 멤버 목록 조회")
 	@Test
 	void findByUsernameAndAgeGreaterThen() {
 	    
@@ -93,5 +93,23 @@ class MemberJpaRepositoryTest {
 	    assertThat(result.get(0).getUsername()).isEqualTo("AAA");
 	    assertThat(result.get(0).getAge()).isEqualTo(20);
 	    assertThat(result.size()).isEqualTo(1);
+	}
+
+	@DisplayName("usernmae이 일치하는 멤버 목록 조회(NamedQuery)")
+	@Test
+	void findByUsername() {
+
+	    // given
+		Member m1 = new Member("AAA", 10);
+		Member m2 = new Member("BBB", 20);
+		memberJpaRepository.save(m1);
+		memberJpaRepository.save(m2);
+
+	    // when
+		List<Member> result = memberJpaRepository.findByUsername("AAA");
+		Member findMember = result.get(0);
+
+	    // then
+		assertThat(findMember).isEqualTo(m1);
 	}
 }
