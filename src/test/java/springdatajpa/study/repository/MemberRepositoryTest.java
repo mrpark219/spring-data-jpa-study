@@ -1,5 +1,7 @@
 package springdatajpa.study.repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,9 @@ class MemberRepositoryTest {
 
 	@Autowired
 	TeamRepository teamRepository;
+
+	@PersistenceContext
+	EntityManager em;
 
 	@DisplayName("멤버 생성 및 저장 후 조회하여 같은 데이터가 있는지 확인.")
 	@Test
@@ -297,5 +302,27 @@ class MemberRepositoryTest {
 		assertThat(page.getTotalPages()).isEqualTo(2);
 		assertThat(page.isFirst()).isTrue();
 		assertThat(page.hasNext()).isTrue();
+	}
+
+	@DisplayName("파라미터로 주어진 나이 이상인 모든 멤버의 나이를 +1 한다.")
+	@Test
+	void bulkAgePlus() {
+
+		// given
+		memberRepository.save(new Member("member1", 10));
+		memberRepository.save(new Member("member2", 19));
+		memberRepository.save(new Member("member3", 20));
+		memberRepository.save(new Member("member4", 21));
+		memberRepository.save(new Member("member5", 40));
+
+		// when
+		int resultCount = memberRepository.bulkAgePlus(20);
+
+		// 벌크 연산 뒤에는 영속성 컨텍스트 초기화 필수! = @Modifying(clearAutomatically = true)
+		//em.flush();
+		//em.clear();
+
+		// then
+		assertThat(resultCount).isEqualTo(3);
 	}
 }
