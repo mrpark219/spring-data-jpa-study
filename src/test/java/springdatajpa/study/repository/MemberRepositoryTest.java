@@ -4,6 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import springdatajpa.study.dto.MemberDto;
@@ -216,5 +220,82 @@ class MemberRepositoryTest {
 		assertThat(memberList.get(0)).isEqualTo(m1);
 		assertThat(findMember).isEqualTo(m1);
 		assertThat(optionalMember.get()).isEqualTo(m1);
+	}
+
+	@DisplayName("전체 멤버 조회 페이징")
+	@Test
+	void findPageByAge() {
+
+		// given
+		memberRepository.save(new Member("member1", 10));
+		memberRepository.save(new Member("member2", 10));
+		memberRepository.save(new Member("member3", 10));
+		memberRepository.save(new Member("member4", 10));
+		memberRepository.save(new Member("member5", 10));
+
+		int age = 10;
+		PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+		// when
+		Page<Member> page = memberRepository.findPageByAge(age, pageRequest);
+		//Page<MemberDto> map = page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+
+		// then
+		assertThat(page.getContent().size()).isEqualTo(3);
+		assertThat(page.getTotalElements()).isEqualTo(5);
+		assertThat(page.getNumber()).isEqualTo(0);
+		assertThat(page.getTotalPages()).isEqualTo(2);
+		assertThat(page.isFirst()).isTrue();
+		assertThat(page.hasNext()).isTrue();
+	}
+
+	@DisplayName("전체 멤버 조회 페이징")
+	@Test
+	void findSliceByAge() {
+
+		// given
+		memberRepository.save(new Member("member1", 10));
+		memberRepository.save(new Member("member2", 10));
+		memberRepository.save(new Member("member3", 10));
+		memberRepository.save(new Member("member4", 10));
+		memberRepository.save(new Member("member5", 10));
+
+		int age = 10;
+		PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+		// when
+		Slice<Member> page = memberRepository.findSliceByAge(age, pageRequest);
+
+		// then
+		assertThat(page.getContent().size()).isEqualTo(3);
+		assertThat(page.getNumber()).isEqualTo(0);
+		assertThat(page.isFirst()).isTrue();
+		assertThat(page.hasNext()).isTrue();
+	}
+
+	@DisplayName("전체 멤버 조회 페이징")
+	@Test
+	void findSelfPageByAge() {
+
+		// given
+		memberRepository.save(new Member("member1", 10));
+		memberRepository.save(new Member("member2", 10));
+		memberRepository.save(new Member("member3", 10));
+		memberRepository.save(new Member("member4", 10));
+		memberRepository.save(new Member("member5", 10));
+
+		int age = 10;
+		PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+		// when
+		Page<Member> page = memberRepository.findSelfPageByAge(age, pageRequest);
+
+		// then
+		assertThat(page.getContent().size()).isEqualTo(3);
+		assertThat(page.getTotalElements()).isEqualTo(5);
+		assertThat(page.getNumber()).isEqualTo(0);
+		assertThat(page.getTotalPages()).isEqualTo(2);
+		assertThat(page.isFirst()).isTrue();
+		assertThat(page.hasNext()).isTrue();
 	}
 }
